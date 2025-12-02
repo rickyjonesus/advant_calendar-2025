@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:day2}",
+            "name": "Debug day2",
+            "target": "day2",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug day2"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:day2}",
+            "name": "Release day2",
+            "target": "day2",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release day2"
+        }
+    ]
+}
