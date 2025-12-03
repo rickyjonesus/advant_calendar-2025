@@ -23,7 +23,7 @@ func readLinesFromFile(filePath: String) -> [String]? {
     }
 }
 
-func isRepeating(str: String) -> Bool {
+func doesRepeatTwice(str: String) -> Bool {
     
     let length = str.count
     if length % 2 != 0 {
@@ -42,12 +42,9 @@ func isRepeating(str: String) -> Bool {
 
 
 @main
-struct day2 {
+struct part1 {
     static func main() {
         print("Hello, world!")
-
-
-
         let tokens = readLinesFromFile(filePath: "./data.txt");
         if let lines = tokens {
             var total = 0
@@ -57,7 +54,7 @@ struct day2 {
                 let end = Int(parts[1])!
                 for i in start...end {
                     let str = String(i)
-                    if isRepeating(str: str) {
+                    if doesRepeatTwice(str: str) {
                         total = total + i
                         print("\(i) is repeating")
                     }
