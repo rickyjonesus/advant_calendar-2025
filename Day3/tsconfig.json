@@ -3,6 +3,6 @@
         "module": "commonjs",
         "target": "es2016",
         "strict": true,
-        "sourceMap": true
+        "lib": ["ESNext.Array", "DOM", "ESNext"]
     }
 }
