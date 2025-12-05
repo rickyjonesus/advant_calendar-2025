@@ -59,7 +59,7 @@ class Main {
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
-
+        // Part 1
         long total = 0;
         for (long item : ingredients) {
             for (range r : ranges) {
@@ -70,7 +70,7 @@ class Main {
             }
         }
         System.out.println(total);
-
+        // Part 2
         List<range> combinedRanges = new ArrayList<>();
         while (true) {
             List<range> newRanges = combineOverLapping(ranges);
