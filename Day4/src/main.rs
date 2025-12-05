@@ -32,14 +32,12 @@ fn load_file(file_name: &str) -> Vec<String> {
     return contents;
 }
 
-fn main() {
-    let roll_list = load_file("./src/data.txt");
-
-    let spots = load_roles(roll_list);
-    println!("{}", spots.len());
+fn remove_roles(spots: HashMap<i32, Vec<i32>>) -> (HashMap<i32, Vec<i32>>, i32) {
     let mut count = 0;
-
+    let mut removed_roles: HashMap<i32, Vec<i32>> = HashMap::new();
     for (row_index, col_vals) in spots.iter() {
+        let row = removed_roles.entry(*row_index).or_insert(Vec::new());
+
         for col_val in col_vals {
             let mut total_touching_rolls = 0;
             //check previous row
@@ -71,9 +69,45 @@ fn main() {
                 }
             }
             if total_touching_rolls < 4 {
+                row.push(*col_val);
                 count += 1;
             }
         }
     }
-    println!("count: {}", count);
+    (removed_roles, count)
+}
+fn clone_roles_with_removed(
+    spots: HashMap<i32, Vec<i32>>,
+    removed_roles: HashMap<i32, Vec<i32>>,
+) -> HashMap<i32, Vec<i32>> {
+    let mut ret: HashMap<i32, Vec<i32>> = HashMap::new();
+    ret.clear();
+    for (row_index, col_vals) in spots.iter() {
+        let row = ret.entry(*row_index).or_insert(Vec::new());
+        for col_val in col_vals {
+            if removed_roles.contains_key(row_index) {
+                if removed_roles.get(row_index).unwrap().contains(col_val) {
+                    continue;
+                }
+            }
+            row.push(*col_val);
+        }
+    }
+    return ret;
+}
+
+fn main() {
+    let roll_list = load_file("./src/data.txt");
+
+    let mut spots = load_roles(roll_list);
+    let mut total_count = 0;
+    loop {
+        let (removed_roles, count) = remove_roles(spots.clone());
+        spots = clone_roles_with_removed(spots.clone(), removed_roles.clone());
+        if count == 0 {
+            break;
+        }
+        total_count += count;
+    }
+    println!("count: {}", total_count);
 }
