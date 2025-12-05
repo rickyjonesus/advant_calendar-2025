@@ -1,108 +1,79 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-
-
-struct Spot{
-    has_roll: bool,
-}
-
-fn load_roles(_contents: Vec<String>) -> Vec<Vec<Spot>> {
-    let mut ret: Vec<Vec<Spot>> = vec![vec![]];
-    for line in _contents { 
-        let mut row = Vec::new();
+fn load_roles(_contents: Vec<String>) -> HashMap<i32, Vec<i32>> {
+    let mut ret: HashMap<i32, Vec<i32>> = HashMap::new();
+    ret.clear();
+    let mut row_index = 0;
+    for line in _contents {
+        let mut col_index = 0;
+        let row = ret.entry(row_index).or_insert(Vec::new());
         for c in line.chars() {
-            print!("{} ", c);
-            let spot = Spot{
-                has_roll: if c == '@' { true } else { false },
-            };
-            row.push(spot);
+            if c == '@' {
+                row.push(col_index);
+            }
+            col_index += 1;
         }
-        println!("");
-        ret.push(row);
+        row_index += 1;
     }
 
     return ret;
 }
 
-fn main() {
-    let file = File::open("./src/example-data.txt").expect("Unable to open file");
+fn load_file(file_name: &str) -> Vec<String> {
+    let file = File::open(file_name).expect("Unable to open file");
     let reader = io::BufReader::new(file);
     let mut contents = Vec::new();
     for line in reader.lines() {
         let line = line.unwrap();
         contents.push(line);
     }
-    
-    let spots = load_roles(contents);
-    let mut rowIndex = 0;
-    let mut availableRolls = 0;
-    for row in spots.iter() {
+    return contents;
+}
 
-        let mut colIndex = 0;
+fn main() {
+    let roll_list = load_file("./src/data.txt");
 
-        for col in row.iter() {
-            let mut totalTouchingRolls = 0;
-            if(col.has_roll){
-            
-                //Directly before
-                if colIndex > 1 && spots[rowIndex][colIndex - 1].has_roll {
-                    totalTouchingRolls += 1;
-                 
-                }
+    let spots = load_roles(roll_list);
+    println!("{}", spots.len());
+    let mut count = 0;
 
-
-                //Directly after
-                if colIndex < row.len() - 1 && spots[rowIndex][colIndex + 1].has_roll {
-                 
-                    totalTouchingRolls += 1;
-                }
-                let beginRange = if colIndex > 1 { colIndex - 1 } else { 1 };
-                let endRange = if colIndex < row.len() - 1 { colIndex + 1 } else { row.len() - 1 };
-                //Directly Above
-                if rowIndex > 1
-                {                    
-                    for rel in beginRange..endRange {
-                        if spots[rowIndex - 1][rel].has_roll {
-                            totalTouchingRolls += 1;
-                        }
+    for (row_index, col_vals) in spots.iter() {
+        for col_val in col_vals {
+            let mut total_touching_rolls = 0;
+            //check previous row
+            if let Some(prev_row) = spots.get(&(*row_index - 1)) {
+                for range in col_val - 1..col_val + 2 {
+                    if prev_row.contains(&range) {
+                        total_touching_rolls += 1;
                     }
                 }
-
-                //Directly Below
-                if rowIndex < spots.len() - 1 {
-                    print!("b{}-{}", beginRange, endRange);
-                    for rel in beginRange..endRange {
-
-                        if spots[rowIndex + 1][rel].has_roll {
-                            totalTouchingRolls += 1;
-                        }
-                    }
-                }
-
-                if totalTouchingRolls < 4{
-                    availableRolls += 1;
-                }
-                if totalTouchingRolls < 4
-                {
-                    print!("@ ");
-                }
-                else
-                {
-                    print!("x ");
-                }
-                print!("{}", totalTouchingRolls);
-
             }
-            else {
-                print!(". ");
-            }   
-            colIndex += 1;
+            //check current row (previous cell)
+            if *col_val > 0 {
+                if col_vals.contains(&(*col_val - 1)) {
+                    total_touching_rolls += 1;
+                }
+            }
+
+            //check current row (next cell)
+            // Assuming no upper bound check needed for correctness, just existence
+            if col_vals.contains(&(*col_val + 1)) {
+                total_touching_rolls += 1;
+            }
+
+            if let Some(next_row) = spots.get(&(*row_index + 1)) {
+                for range in col_val - 1..col_val + 2 {
+                    if next_row.contains(&range) {
+                        total_touching_rolls += 1;
+                    }
+                }
+            }
+            if total_touching_rolls < 4 {
+                count += 1;
+            }
         }
-        println!("");
-        rowIndex += 1;
-
     }
-
-    println!("done {}", availableRolls);
+    println!("count: {}", count);
 }
