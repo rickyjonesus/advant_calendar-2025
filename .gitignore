@@ -6,3 +6,6 @@ package-lock.json
 Day4/target
 Day4/Cargo.lock
 .DS_Store
+Day6/bin
+Day6/obj
+obj

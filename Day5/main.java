@@ -79,7 +79,6 @@ class Main {
             }
             combinedRanges = new ArrayList<>(newRanges);
         }
-        System.out.println(combinedRanges.size());
         long total2 = 0;
         for (range r : combinedRanges) {
             total2 += r.end - r.start + 1;
